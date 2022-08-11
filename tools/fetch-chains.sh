@@ -1,0 +1,1 @@
+curl https://chainid.network/chains.json | jq > ../constants/chains.json

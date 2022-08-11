@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "typeRoots": [
+      "./globals.d.ts"
+    ],
+    "module": "commonjs",
+    "strict": false,
+    "esModuleInterop": true,
+    "target": "es5",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "types": [
+      "node",
+      "mocha"
+    ],
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "lib/**/*",
+    "src/**/*",
+    "./scripts",
+    "./deploy",
+    "./tests",
+    "typechain/**/*",
+    "./hardhat.config.ts",
+    "ignore/discussion_bp.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ],
+}

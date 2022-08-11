@@ -1,0 +1,14 @@
+node_modules
+.idea
+
+#Hardhat files
+cache
+artifacts
+
+# regenerate via 'npx hardhat typechain'
+types
+
+.env
+
+dist
+yarn-error.log
