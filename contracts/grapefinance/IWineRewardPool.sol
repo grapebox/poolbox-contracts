@@ -1,6 +1,13 @@
-// Note that this pool has no minter key of wine (rewards).
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+// https://snowtrace.io/address/0x28c65dcB3a5f0d456624AFF91ca03E4e315beE49#readContract
+// NOTE: this is just copy/pasted from their code
+// NOTE: that this pool has no minter key of wine (rewards).
 // Instead, the governance will call wine distributeReward method and send reward to this pool at the beginning.
-contract WineRewardPool {
+abstract contract WineRewardPool {
 
     struct UserInfo {
         uint256 amount; // How many LP tokens the user has provided.
@@ -40,12 +47,12 @@ contract WineRewardPool {
     uint256 public constant TOTAL_REWARDS = 41000 ether;
 
     // View function to see pending Wine on frontend.
-    function pendingShare(uint256 _pid, address _user) external view returns (uint256);
+    function pendingShare(uint256 _pid, address _user) virtual external view returns (uint256);
     // Deposit LP tokens.
-    function deposit(uint256 _pid, uint256 _amount) public;
+    function deposit(uint256 _pid, uint256 _amount) virtual public;
     // Withdraw LP tokens.
-    function withdraw(uint256 _pid, uint256 _amount);
+    function withdraw(uint256 _pid, uint256 _amount) virtual external;
     // Withdraw without caring about rewards. EMERGENCY ONLY.
-    function emergencyWithdraw(uint256 _pid) public;
+    function emergencyWithdraw(uint256 _pid) virtual public;
 
 }

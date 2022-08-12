@@ -1,15 +1,12 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
 interface IPoolBoxRouter {
 
-    function makePool(address factory) returns (address);
+    function makePool(address factory) external returns (address);
 
-    function swapPool(address pool) returns (address);
+    function deposit(address token, uint256 amount) external;
 
-    function closePool(address pool) returns (address);
-    function pausePool(address pool) returns (address);
-    function blockPool(address pool) returns (address);
-
-    function poolFor(address token) returns (address);
-
-    function deposit(address token, uint256 amount);
+    function poolOf(address token) external returns (address);
 
 }

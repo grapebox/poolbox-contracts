@@ -5,12 +5,12 @@ pragma experimental ABIEncoderV2;
 interface IDevAware {
 
     struct DevInfo {
-        address ;
+        address dev;
         uint256 fee;
     }
 
     // is this better?
-    function devInfo() returns (DevInfo memory);
+    function devInfo() external returns (DevInfo memory);
 
 }
 
@@ -22,9 +22,9 @@ interface IBotAware {
         uint256 fee;
     }
 
-    function botInfo() returns (BotInfo memory);
+    function botInfo() external returns (BotInfo memory);
 
-    function setBotInfo(BotInfo memory info);
+    function setBotInfo(BotInfo memory info) external;
 
 }
 

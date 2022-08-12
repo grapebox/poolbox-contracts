@@ -1,77 +1,104 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "./interfaces/IPoolBox.sol";
 import "./Box.sol";
-import "./DevBotBox.sol";
+import "./DevBotAware.sol";
 
-abstract contract PoolBox is Ownable, DevBotBox, IPoolBox {
+abstract contract PoolBox is Ownable, DevBotAware, IPoolBox {
+    ///
+    /// STRUCTS
 
-    struct PoolInfo {
-        address pool;
-        IERC20 token;
-        IERC20 reward;
+    /// PROPERTIES
+
+    IPoolBox.PoolInfo public _poolInfo;
+    IPoolBox.UsageStats public _usageStats;
+
+    /// CONSTRUCTOR
+
+    constructor(
+        PoolInfo memory _pool,
+        DevInfo memory _dev,
+        BotInfo memory _bot        
+    ) DevBotAware(_dev, _bot) {
+        _poolInfo = _pool;
+        _usageStats = UsageStats(0, 0, 0, 0);
     }
 
-    struct UsageStats {
-        uint256 depositVolume;  // quantity
-        uint256 depositCount;   // quantity
-        uint256 shakeCount;     // quantity
-        uint256 rewardVolume;   // volume
-    }
+    /// PUBLIC METHODS
 
-    PoolInfo poolInfo;
-    UsageStats usageStats;
-
-    constructor(PoolInfo memory _info) public {
-        poolInfo = _info;
-    }
+    /// PUBLIC METHODS - ACTIONS
 
     function deposit(uint256 amount) public {
-        // require(msg.sender == poolInfo.pool);
-        require(amount > 0);
-        // slurp money into us.
-        this.poolInfo.token.transferFrom(msg.sender, address(this), amount);
-        
-        this.usageStats.depositCount ++;  // TODO: safe increment?
-        this.usageStats.depositVolume += amount;
-        
-        this._poolTokenDeposit();
+        // require(msg.sender == _poolInfo.pool);
+        require(amount > 0, "cheapskate");
+
+        // MODIFY INTERNAL STATE
+        _usageStats.deposits++; // TODO: safe increment?
+        _usageStats.deposited += amount;
+
+        // DO EXTERNAL SHIT (slurp money into us.)
+        _poolInfo.token.transferFrom(msg.sender, address(this), amount);
+
+        // EXECUTE POOL ACTION
+        _poolTokenDeposit();
     }
 
-    function deposited() public view returns (address, uint256) {
-        return (poolInfo.token, this.usageStats.depositVolume;)
-    }
-
-    function pool() public view returns (address) {
-        return this.poolInfo.pool;
-    }
-
-    function token() public view returns (address) {
-        return this.poolInfo.token;
-    }
-
-    function reward() public view returns (address) {
-        return this.poolInfo.reward;
-    }
-
-    function shake() {
+    function shake() external returns (uint256) {
         // transfer funds to the bot.
-        this._poolRewardClaim();
-        this.poolInfo.reward.transfer(this.poolInfo.bot, this.usageStats.rewardVolume);
+        _poolRewardClaim();
+
+        return _transferRewardsToBot();
     }
 
-    function shaken() public view returns (address, uint256) {
-        return (poolInfo.reward, this.usageStats.rewardVolume;)
+    function flush() external {
+        _transferRewardsToBot();
     }
 
-    function balance() public view returns (address, uint256) {
-        // return this.poolInfo.token.balanceOf(address(this));
-        return (poolInfo.token, this._poolBalance());
+    function _transferRewardsToBot() internal returns (uint256) {
+        uint256 amount = balanceOfRewardToken();
+        _poolInfo.reward.transfer(_botInfo.bot, amount);
+        return amount;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+
+    /// PUBLIC METHODS - VIEWS
+
+    function poolInfo() external view returns (PoolInfo memory) {
+        return _poolInfo;
+    }
+
+    function usageStats() external view returns (UsageStats memory) {
+        return _usageStats;
+    }
+
+    function balanceOfRewardToken() public view returns (uint256) {
+        return _poolInfo.token.balanceOf(address(this));
+    }
+
+    function balance() public view returns (uint256) {
+        // return this._poolInfo.token.balanceOf(address(this));
+        return _poolTokenBalance();
+    }
+
+    function shakeable() external view returns (uint256) {
+        return _poolRewardBalance();
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
     // TODO: children should deposit into pool.
-    abstract function _poolTokenDeposit() internal;
-    abstract function _poolRewardClaim() internal;
+    function _poolTokenDeposit() virtual internal;
 
-    abstract function _poolTokenBalance() public view returns (uint256);
-    abstract function _poolRewardBalance() public view returns (uint256);
+    function _poolRewardClaim() virtual internal;
 
+    function _poolTokenBalance() virtual internal view returns (uint256);
+
+    function _poolRewardBalance() virtual internal view returns (uint256);
 }
