@@ -9,9 +9,15 @@ contract WinePoolBox is PoolBox {
     address public immutable GRAPE_TOKEN =
         0x5541D83EFaD1f281571B343977648B75d95cdAC2;
 
+    address public immutable WINE_TOKEN =
+        0xC55036B5348CfB45a932481744645985010d3A44;
+
+    address public immutable VINEYARD =
+        0x28c65dcB3a5f0d456624AFF91ca03E4e315beE49;
+
     // FIELDS
 
-    uint256 pid;
+    uint256 public immutable pid;
 
     // CONSTRUCTORS
 
@@ -22,6 +28,7 @@ contract WinePoolBox is PoolBox {
         BotInfo memory _bot
     ) PoolBox(_pool, _dev, _bot) {
         pid = _pid;
+        // transferOwnership(newOwner); TODO: should we transfer to a controller?
     }
 
     /// INTERNAL METHODS
