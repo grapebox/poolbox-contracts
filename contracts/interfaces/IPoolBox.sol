@@ -7,7 +7,7 @@ import "./IDevBotAware.sol";
 import "./lib/IOwnable.sol";
 
 // TODO: What if this was an ERC4626 vault
-interface IPoolBox {
+interface IPoolBox is IBotAware, IDevAware, IOwnable {
     ////////////////////////////////////////////////////////////
     //
     // STRUCTS
